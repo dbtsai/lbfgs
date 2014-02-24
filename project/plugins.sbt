@@ -1,0 +1,11 @@
+resolvers += Classpaths.typesafeResolver
+
+resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
+
+addSbtPlugin("com.alpinenow" % "junit_xml_listener" % "0.4.2-SNAPSHOT")
+
+addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.3.2")
+
+addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.6.0-SNAPSHOT")
+
+addSbtPlugin("com.typesafe.sbt" % "sbt-scalariform" % "1.2.1")
