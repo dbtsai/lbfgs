@@ -1,3 +1,7 @@
+import SonatypeKeys._
+
+sonatypeSettings
+
 name := "lbfgs"
 
 description := "A Java Port of L-BFGS variant Optimization Algorithms."
