@@ -4,9 +4,10 @@ import org.riso.numerical.LBFGS
 import breeze.linalg.norm
 import breeze.optimize.{LBFGS => BrzLBFGS}
 import breeze.optimize.DiffFunction
-import breeze.numerics.Inf
 import breeze.linalg.DenseMatrix
 import breeze.linalg.DenseVector
+import breeze.stats.distributions.Rand
+import breeze.numerics._
 
 /**
  * Created by debasish83 on 12/13/14.
@@ -14,16 +15,17 @@ import breeze.linalg.DenseVector
 object QuadraticObjective {
 
   def getGram(nGram: Int) : DenseMatrix[Double] = {
-    val hrand = DenseMatrix.rand[Double](nGram, nGram)
+    val hrand = DenseMatrix.rand[Double](nGram, nGram, Rand.gaussian(0, 1))
     val hrandt = hrand.t
     val hposdef = hrandt * hrand
-    hposdef.t + hposdef
+    val H = hposdef.t + hposdef
+    H
   }
 
   def getObjAndGrad(H: DenseMatrix[Double],
                     q: DenseVector[Double],
                     x: DenseVector[Double]) : (Double, DenseVector[Double]) = {
-    val obj = x.t*H*x*0.5 + q.dot(x)
+    val obj = (x.t*H*x)*0.5 + q.dot(x)
     val grad = H*x + q
     (obj, grad)
   }
@@ -56,7 +58,7 @@ object QuadraticObjective {
     val msave = 7
     val nwork = ndim * (2 * msave + 1) + 2 * msave
 
-    println(s"Generating random quadratic problem of dimension $n")
+    println(s"BFGS comparison for random quadratic problem of dimension $n iters $iters")
 
     val H = getGram(n)
     val q = DenseVector.rand[Double](n)
@@ -94,8 +96,9 @@ object QuadraticObjective {
     println(s"BreezeLBFGS objective ${brzObjAndGrad._1}")
 
     do {
-      f = (x.t * H * x) * 0.5 + q.dot(x)
-      g := H * x + q
+      val (obj, grad) = getObjAndGrad(H, q, x)
+      f = obj
+      g := grad
 
       try {
         LBFGS.lbfgs(n, m, x.data, f, g.data, diagco, diag, iprint, eps, xtol, iflag)
